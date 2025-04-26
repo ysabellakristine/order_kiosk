@@ -1,0 +1,16 @@
+/* id for applying papyrus since tailwind doesn't have papyrus or comic sans ms */
+#papyrus {
+    font-family: "Papyrus", sans-serif;
+    text-transform: uppercase;
+}
+
+/* i lost my mind trying to figure this out so i had to ask my bff chatgpt */
+/* turns into comic sans ms when cursor is hovered */
+.hover\:font-comic:hover {
+    font-family: 'Comic Sans MS', sans-serif;
+}
+
+.font-comic{
+    font-family: 'Comic Sans MS', sans-serif;
+    text-transform: lowercase;
+}
