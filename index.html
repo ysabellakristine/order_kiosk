@@ -8,6 +8,8 @@
     
     <!-- Installing tailwind / not for development purposes -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- CDN for JQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
     <link href="styles.css" rel="stylesheet">
 
@@ -17,204 +19,228 @@
 
 <body class="bg-[url('images/wallpaper.png')] bg-repeat bg-top">
     <!-- NAVBAR SECTION -->
-    <div class="flex flex-col h-screen">
-        <section class="header w-full bg-purple-800 p-3 flex flex-col sm:flex-row justify-around items-center border-4 border-black border-solid font-serif tracking-wide">
-            <div class="logo mr-auto flex items-center">
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <div class="w-1/4 bg-purple-800 p-3 border-4 border-black border-solid flex flex-col items-center">
+            <div class="logo flex items-center mb-6">
                 <img src="images/metatton.png" alt="icon" class="w-20 h-20 mr-2">
                 <div class="text-3xl text-white font-medium hover:text-yellow-200">M T T</div>
             </div>
-            <div class="links flex py-4 sm:flex-row text-2xl gap-x-8">
-                <div class="hover:underline ml-4 flex items-center">
-                    <a href="index.html" class="text-white hover:text-yellow-200">Home</a>
-                </div>
-                <div class="hover:underline ml-4 flex items-center">
-                    <a href="menu.html" class="text-white hover:text-yellow-200">Menu</a>
-                </div>
-                <div class="hover:underline ml-4 flex items-center">
-                    <a href="q_a.html" class="text-white hover:text-yellow-200">Q & A</a>
+            
+            <!-- Filters for menu place here: Meal, Drink, Sweets -->
+            <div class="w-full bg-gray-800 p-8">
+                <h3 class="text-xl font-semibold text-white mb-6 text-center">Filters</h3>
+                <div class="flex flex-col gap-4">
+                    <button class="filter-btn bg-purple-600 text-white py-4 px-6 text-lg rounded hover:bg-yellow-500" data-category="all">All</button>
+                    <button class="filter-btn bg-purple-600 text-white py-4 px-6 text-lg rounded hover:bg-yellow-500" data-category="meal">Meal</button>
+                    <button class="filter-btn bg-purple-600 text-white py-4 px-6 text-lg rounded hover:bg-yellow-500" data-category="drink">Drink</button>
+                    <button class="filter-btn bg-purple-600 text-white py-4 px-6 text-lg rounded hover:bg-yellow-500" data-category="sweets">Sweets</button>
                 </div>
             </div>
-        </section>
+        </div>
 
         <!-- BODY SECTION -->
-
-         <!-- Container for the box -->
-        <div class="container mx-auto my-10 w-50 p-5 font-sans bg-white bg-opacity-60">
+        <div class="flex-grow mx-10 my-10 p-5 font-sans bg-white bg-opacity-60">
             <!-- Menu List -->
-        <div class="flex justify-around p-6" id="menu">
-            <div>
-                <!-- For renderMenu function -->
-                <h2 class="text-8xl mb-4 text-center">Menu</h2>
-                <div id="menu-list"></div>
+            <div class="flex flex-col md:flex-row gap-6">
+                <div class="w-full md:w-2/3">
+                    <h2 class="text-8xl mb-4 text-center">Menu</h2>
+                    <div id="menu-list" class="ms-20 flex-col gap-4">
+                    <!-- For renderMenu() function -->
+                    </div>
+                </div> 
+
+                <div class="p-5 font-sans bg-black border-white border-4 text-white w-full md:w-1/3">
+                    <h2 class="text-5xl mb-4">Purchase List</h2>
+                    <hr>
+                    <ul id="cart-items" class="my-4 space-y-2"></ul>
+                    <hr>
+                    <p class="text-center mt-2">Total: $<span id="total">0.00</span></p>
+                    <label for="payment" class="block mt-4">Enter Payment:</label>
+                    <input id="payment" type="number" min="0" step="0.01" class="w-full text-black text-center rounded mt-1 p-1">
+                    <button id="pay-button" class="bg-purple-600 text-white p-2 rounded mt-2 w-full hover:bg-yellow-500">Pay</button>
+                </div>
             </div>
 
-            <div class ="p-5 font-sans bg-black border-white border-4 text-white">
-                <h2 class="container text-5xl mb-4 ">Purchase List</h2> <hr>
-                <ul id="cart-items"></ul>
-                <hr>
-                <p class = "text-center">Total: $<span id="total">0.00</span></p>
-                <label for="payment" class="block mt-4">Enter Payment:</label>
-                <input id="payment" type="number" min="0" step="0.01" class="w-full text-black text-center rounded mt-1 p-1">
-                <button onclick="processPayment()" class="bg-purple-600 text-white p-2 rounded mt-2 w-full hover:bg-yellow-500">Pay</button>
+            <div id="preview" class="absolute hidden bg-white border p-4 max-w-xs">
+                <img id="preview-img" src="" alt="Preview" class="w-full h-auto">
             </div>
         </div>
-
-        <div id="preview" class="absolute hidden bg-white border p-4 max-w-xs">
-            <img id="preview-img" src="" alt="Preview" class="w-full h-auto">
-        </div>
-        </div>
-        <!-- FOOTER SECTION -->
-        <footer class="w-full bg-purple-800 text-white text-center py-4 mt-auto border-4 border-black border-solid font-serif tracking-wider">
-            <div class="flex justify-center text-left gap-4">
-                <p class="mt-2">&copy; 2025 MTT Burger Emporium</p>
-            </div>
-        </footer>
     </div>
+
+    <!-- Receipt Modal -->
+        <div id="receipt-popup" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 hidden">
+            <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
+            <h2 class="text-5xl font-bold font-sans mb-4 text-center"> MTT Receipt</h2>
+            <hr>
+            <div id="receipt-items" class="text-sm space-y-1 mb-4"></div>
+            <div class="border-t pt-4 text-sm">
+                <p><strong>Total (₱):</strong> <span id="receipt-total" class="float-right"></span></p>
+                <p><strong>Payment (₱):</strong> <span id="receipt-payment" class="float-right"></span></p>
+                <p><strong>Change (₱):</strong> <span id="receipt-change" class="float-right"></span></p>
+            </div>
+            <button onclick="closeReceipt()" class="mt-6 w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-yellow-700 transition">
+                Close
+            </button>
+            </div>
+        </div>
+  
+
+    <!-- FOOTER SECTION -->
+    <footer class="w-full bg-purple-800 text-white text-center mt-20 mb-auto py-4 border-4 border-black border-solid font-serif tracking-wider">
+        <div class="flex justify-center items-center gap-4">
+            <p class="mt-2">&copy; 2025 MTT Burger Emporium</p>
+        </div>
+    </footer>
 
     <script>
 
         // menu array
         const menu = [
-            { name: "Starfait", price: 60, img: "images/starfait.png", des: "Very popular food." },
-            { name: "Glamburger", price: 120, img: "images/glamburger.png", des: "Very popular food #2" },
-            { name: "Legendary Hero", price: 300, img: "images/legendary_hero.png" , des: "Hero Sandwich. ATTACK UP in battle.."},
-            { name: "Steak", price: 500, img: "images/steak.png" , des: "Steak in the Shape of Mettaton's Face."},
-            { name: "Soda", price: 50, img: "images/soda.png", des: "Fizzy pop." },
-            { name: "Popcorn", price: 100, img: "images/popcorn.png", des: "Pops in your mouth." },
-            { name: "Pizza", price: 140, img: "images/pizza.png", des: "Mmm Pizza." },
-            { name: "Hotdog", price: 160, img: "images/hotdog.png", des: "Not a real dog." },
-            { name: "Cupcake", price: 20, img: "images/cupcake.png", des: "Sweet."},
-            { name: "Donut", price: 50, img: "images/donut.png" , des: "Do not search the donut fic on AO3."}
+            { name: "Starfait", price: 60, img: "images/starfait.png", des: "Very popular food.", category: "drink" },
+            { name: "Glamburger", price: 120, img: "images/glamburger.png", des: "Very popular food #2", category: "meal" },
+            { name: "Legendary Hero", price: 300, img: "images/legendary_hero.png", des: "Hero Sandwich. ATTACK UP in battle..", category: "meal" },
+            { name: "Steak", price: 500, img: "images/steak.png", des: "Steak in the Shape of Mettaton's Face.", category: "meal" },
+            { name: "Soda", price: 50, img: "images/soda.png", des: "Fizzy pop.", category: "drink" },
+            { name: "Popcorn", price: 100, img: "images/popcorn.png", des: "Pops in your mouth.", category: "meal" },
+            { name: "Pizza", price: 140, img: "images/pizza.png", des: "Mmm Pizza.", category: "meal" },
+            { name: "Hotdog", price: 160, img: "images/hotdog.png", des: "Not a real dog.", category: "meal" },
+            { name: "Cupcake", price: 20, img: "images/cupcake.png", des: "Sweet.", category: "sweets" },
+            { name: "Donut", price: 50, img: "images/donut.png", des: "Do not search the donut fic on AO3.", category: "sweets" }
         ];
-        
+
         // cart list which is empty
         let cart = [];
-        
+
         // function to show menu
         function rendermenu() {
-            // reminder that const is how js declares a variable
-            const list = document.getElementById("menu-list");
-            // innerHTML to change the html inside an element but NOT RECOMMENDED FOR ACTUAL USE
-            // can be vulnerable to XSS attacks
-            list.innerHTML = ""; // Clear existing content
-        
-            // declares menu items to be 4 per row
+            const $list = $("#menu-list");
+            $list.empty(); // Clear existing content
+
             const itemsPerRow = 4;
-            // for loop where i is the current item 
-            for (let i = 0; i < menu.length; i += itemsPerRow) {  
-                // .createElement creates div with each menu item
-                const row = document.createElement("div");
-                row.className = "flex justify-center mb-4"; // Row container with tailwind
-        
-                // within first for loop, we have another for loop for EACH menu item
-                // had to use j because it was making things weird for the rows
-                for (let j = i; j < i + itemsPerRow && j < menu.length; j++) {
-                    const menuItem = menu[j];
-                    const item = document.createElement("div");
-                    item.className = "p-4 flex flex-col items-center bg-black rounded-lg shadow-md w-48 mx-2 text-center text-white";
-        
-                    // sir umiyak ako dito
-                    item.innerHTML = `
-                        <img src="${menuItem.img}" alt="${menuItem.name}" class="w-24 h-24 object-contain mb-2 rounded">
-                        <span class="text-lg font-semibold mb-1">${menuItem.name}</span>
-                        <span class="text-sm mb-2">$${menuItem.price.toFixed(2)}</span>
-                        <span class="text-s italic mb-2">${menuItem.des}</span>
-                        <input id="qty-${j}" type="number" min="1" value="1" class="w-16 text-black mb-2 text-center rounded">
-                        <button onclick="addToCart(${j})" class="bg-purple-600 text-white px-3 py-1 rounded hover:bg-yellow-500">Add</button>
-                    `;
-                    
-                    //appendChild adds the item to the menu list
-                    row.appendChild(item);
-                }
-                //appendChild adds the menu list items to the rows
-                list.appendChild(row);
+            const filteredMenu = currentFilter === "all" ? menu : menu.filter(item => item.category === currentFilter);
+
+            for (let i = 0; i < filteredMenu.length; i += itemsPerRow) {
+            const $row = $("<div>").addClass("flex justify-center mb-4");
+
+            for (let j = i; j < i + itemsPerRow && j < filteredMenu.length; j++) {
+                const menuItem = filteredMenu[j];
+                const menuIndex = menu.findIndex(m => m.name === menuItem.name); // Original index for button
+                const $item = $(`
+                <div class="p-4 flex flex-col items-center bg-black rounded-lg shadow-md w-48 mx-2 text-center text-white">
+                    <img src="${menuItem.img}" alt="${menuItem.name}" class="w-24 h-24 object-contain mb-2 rounded">
+                    <span class="text-lg font-semibold mb-1">${menuItem.name}</span>
+                    <span class="text-sm mb-2">$${menuItem.price.toFixed(2)}</span>
+                    <span class="text-s italic mb-2">${menuItem.des}</span>
+                    <input id="qty-${menuIndex}" type="number" min="1" value="1" class="w-16 text-black mb-2 text-center rounded">
+                    <button data-index="${menuIndex}" class="add-to-cart bg-purple-800 text-white px-3 py-1 rounded hover:bg-yellow-800">Add</button>
+                </div>
+                `);
+                $row.append($item);
             }
+
+    $list.append($row);
+} 
         }
-        
         // adds item to cart
         function addToCart(index) {
-            const qtyInput = document.getElementById(`qty-${index}`);
-            const quantity = parseInt(qtyInput.value) || 1;
-        
-            // Add to cart with quantity
+            const quantity = parseInt($(`#qty-${index}`).val()) || 1;
             const existingItem = cart.find(item => item.name === menu[index].name);
+
             if (existingItem) {
                 existingItem.quantity += quantity;
             } else {
                 cart.push({ ...menu[index], quantity });
             }
-        
             updateCart();
         }
-        
-    
+
+        $(document).ready(function () {
+            rendermenu();
+
+            // Delegate add button clicks
+            $("#menu-list").on("click", ".add-to-cart", function () {
+                const index = $(this).data("index");
+                addToCart(index);
+            });
+
+            // Payment button
+            $("#pay-button").on("click", processPayment);
+        });
+
         // update cart list to show
         function updateCart() {
-            const cartList = document.getElementById("cart-items");
-            const totalEl = document.getElementById("total");
-            cartList.innerHTML = "";
-        
-            let total = 0;
-        
-            // Optional: add a header row
-            const header = document.createElement("li");
-            header.className = "grid grid-cols-3 gap-2 font-bold border-b pb-1 mb-2";
-            header.innerHTML = `
-                <span class="text-left">Item</span>
-                <span class="text-center">Qty</span>
-                <span class="text-right">Price</span>
-            `;
-            cartList.appendChild(header);
-        
-            cart.forEach((item) => {
-                const itemTotal = item.price * item.quantity;
-                const cartItem = document.createElement("li");
-                cartItem.className = "grid grid-cols-3 gap-2 py-1";
-        
-                cartItem.innerHTML = `
-                    <span class="text-left">${item.name}</span>
-                    <span class="text-center">${item.quantity}</span>
-                    <span class="text-right">$${itemTotal.toFixed(2)}</span>
-                `;
-        
-                cartList.appendChild(cartItem);
-                total += itemTotal;
-            });
-        
-            totalEl.textContent = total.toFixed(2);
-        }
-        
-        function processPayment() {
-            const paymentInput = document.getElementById("payment");
-            const total = parseFloat(document.getElementById("total").textContent);
-            const paymentAmount = parseFloat(paymentInput.value);
-            const change = paymentAmount - total;
-            const owed = total - paymentAmount;
+            const $cartList = $("#cart-items");
+            const $totalEl = $("#total");
+            $cartList.empty();
 
-            if (isNaN(paymentAmount)) {
-                alert("Bro. Please enter an amount.");
-                return;
-            }
-        
-            if (paymentAmount < total) {
-                alert(`You need more money bro. \n\nTotal: $${total.toFixed(2)}\nYou Paid: $${paymentAmount.toFixed(2)}\nStill Owed: $${(owed).toFixed(2)}`);
-            } else if (total === 0){
-                alert(`Here's your money back, bestie. \n You didn't even buy anything. \nMoney back: $${paymentAmount.toFixed(2)}`);
-                cart = [];
-                updateCart();
-                paymentInput.value = "";
-            } else {
-                alert(`Thanks for your order!\n\nTotal: $${total.toFixed(2)}\nYou Paid: $${paymentAmount.toFixed(2)}\nYour Change: $${change.toFixed(2)}\n`);
-                cart = [];
-                updateCart();
-                paymentInput.value = "";
-            }
+            let total = 0;
+            const $header = $(`
+                <li class="grid grid-cols-3 gap-2 font-bold border-b pb-2 mb-2">
+                    <span>Item</span><span>Qty</span><span>Price</span>
+                </li>
+            `);
+            $cartList.append($header);
+
+            cart.forEach(item => {
+                const $row = $(`
+                    <li class="grid grid-cols-3 gap-2 mb-1">
+                        <span>${item.name}</span>
+                        <span>${item.quantity}</span>
+                        <span>$${(item.price * item.quantity).toFixed(2)}</span>
+                    </li>
+                `);
+                total += item.price * item.quantity;
+                $cartList.append($row);
+            });
+
+            $totalEl.text(total.toFixed(2));
         }
+
+        // process payment modal eme
+        function processPayment() {
+            const payment = parseFloat($("#payment").val());
+            const total = parseFloat($("#total").text());
+          
+            if (isNaN(payment) || payment < total) {
+                const owed = total - payment;
+                alert(`KULANG PAYMENT MO BHIE.\n\nTotal: $${total.toFixed(2)}\nYou Paid: $${payment.toFixed(2)}\nStill Owed: $${owed.toFixed(2)}`);
+                return;
+              }
+          
+            const change = payment - total;
+            const receiptItems = $("#receipt-items");
+            receiptItems.empty();
+          
+            cart.forEach(item => {
+              const line = $(`<p>${item.quantity} × ${item.name} <span class="float-right">₱${(item.quantity * item.price).toFixed(2)}</span></p>`);
+              receiptItems.append(line);
+            });
+          
+            $("#receipt-total").text(total.toFixed(2));
+            $("#receipt-payment").text(payment.toFixed(2));
+            $("#receipt-change").text(change.toFixed(2));
+          
+            $("#receipt-popup").removeClass("hidden");
+          
+            // reset carttt
+            cart = [];
+            $("#cart").empty();
+            $("#payment").val('');
+            $("#total").text('0.00');
+          }
+          
+          function closeReceipt() {
+            $("#receipt-popup").addClass("hidden");
+          }
+          
+        let currentFilter = "all"; // show all menu
+        // filter categories of menu
+        $(".filter-btn").on("click", function () {
+            currentFilter = $(this).data("category");
+            rendermenu();
+        });
         
-    
-        // Render the menu when the page loads
-        window.onload = rendermenu;
     </script>
-    
 </body>
 </html>
