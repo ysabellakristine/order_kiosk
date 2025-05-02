@@ -213,7 +213,7 @@
             receiptItems.empty();
           
             cart.forEach(item => {
-              const line = $(`<p>${item.quantity} × ${item.name} <span class="float-right">₱${(item.quantity * item.price).toFixed(2)}</span></p>`);
+              const line = $(`<p>${item.quantity} × ${item.name} <span class="float-right">$${(item.quantity * item.price).toFixed(2)}</span></p>`);
               receiptItems.append(line);
             });
           
@@ -241,6 +241,8 @@
             rendermenu();
         });
         
+        window.onload = rendermenu;
+
     </script>
 </body>
 </html>
